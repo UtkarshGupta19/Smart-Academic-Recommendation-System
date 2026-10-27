@@ -1,0 +1,6 @@
+node_modules
+server/node_modules
+cpp_engine/bin
+.git
+.DS_Store
+*.md
