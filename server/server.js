@@ -6,13 +6,14 @@ const { spawn } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Path to C++ DSA Engine executable
-const ENGINE_PATH = path.resolve(__dirname, '../cpp_engine/bin/sars_engine');
+// Path to C++ DSA Engine executable (configurable via environment variable)
+const ENGINE_PATH = process.env.ENGINE_PATH || path.resolve(__dirname, '../cpp_engine/bin/sars_engine');
 
 // Load initial sample data
 const coursesFilePath = path.join(__dirname, 'data/courses.json');
@@ -346,8 +347,8 @@ app.get('*', (req, res) => {
 
 // Start Express Server
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`SARS API Server running smoothly on http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`SARS API Server running smoothly on http://${HOST}:${PORT}`);
     console.log(`C++ DSA Engine connected at: ${ENGINE_PATH}`);
   });
 }

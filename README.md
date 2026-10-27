@@ -192,6 +192,19 @@ Open your browser at: **`http://localhost:3000`**
 
 ---
 
+## ☁️ Deploy to Render (1-Click Cloud Deployment)
+
+This repository includes a multi-stage `Dockerfile` and `render.yaml` blueprint:
+
+1. Sign in to **[Render.com](https://render.com)** with your GitHub account.
+2. Click **New +** $\rightarrow$ **Web Service**.
+3. Connect your repository: **`Smart-Academic-Recommendation-System`**.
+4. Render automatically detects the **Docker** runtime.
+5. Select the **Free** instance type and click **Deploy Web Service**.
+6. The service compiles the C++17 engine inside Linux and serves the application on `http://0.0.0.0:$PORT` at your assigned `.onrender.com` domain.
+
+---
+
 ## 🎯 Viva Examination Questions & Model Answers
 
 ### Q1: Why use an AVL Tree instead of an ordinary BST or Hash Map for courses?

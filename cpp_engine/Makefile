@@ -1,10 +1,12 @@
-CXX = clang++
+CXX ?= $(shell which clang++ 2>/dev/null || which g++ 2>/dev/null || echo g++)
 CXXFLAGS = -std=c++17 -O2 -Wall -Wextra -Iinclude
 BIN_DIR = bin
 SRC_DIR = src
 TEST_DIR = tests
 
 all: $(BIN_DIR)/sars_engine $(BIN_DIR)/test_suite
+
+engine: $(BIN_DIR)/sars_engine
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
@@ -21,4 +23,4 @@ test: $(BIN_DIR)/test_suite
 clean:
 	rm -rf $(BIN_DIR)
 
-.PHONY: all test clean
+.PHONY: all engine test clean

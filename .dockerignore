@@ -2,5 +2,9 @@ node_modules
 server/node_modules
 cpp_engine/bin
 .git
+.github
 .DS_Store
+*.log
+.vscode
+.idea
 *.md
