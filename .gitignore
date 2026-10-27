@@ -1,0 +1,19 @@
+# Binaries & build outputs
+cpp_engine/bin/
+*.o
+*.out
+*.dSYM/
+
+# Node dependencies & logs
+node_modules/
+server/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# System & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

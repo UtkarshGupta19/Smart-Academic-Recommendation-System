@@ -1,0 +1,178 @@
+[
+  {
+    "id": "CS101",
+    "name": "Introduction to Programming",
+    "track": "Core",
+    "credits": 4,
+    "difficulty": 1,
+    "semester": 1,
+    "prerequisites": [],
+    "keywords": ["python", "variables", "control flow", "functions", "basics"],
+    "description": "Foundational programming concepts, procedural logic, and problem solving."
+  },
+  {
+    "id": "CS102",
+    "name": "Discrete Mathematics",
+    "track": "Theory",
+    "credits": 3,
+    "difficulty": 2,
+    "semester": 1,
+    "prerequisites": [],
+    "keywords": ["sets", "logic", "graphs", "combinatorics", "proofs"],
+    "description": "Mathematical foundations for computer science including propositional logic and relations."
+  },
+  {
+    "id": "CS201",
+    "name": "Data Structures & Algorithms",
+    "track": "Core",
+    "credits": 4,
+    "difficulty": 3,
+    "semester": 2,
+    "prerequisites": ["CS101"],
+    "keywords": ["arrays", "linked lists", "trees", "sorting", "complexity", "graphs"],
+    "description": "Classic data structures and algorithm analysis including asymptotic bounds and recursion."
+  },
+  {
+    "id": "CS202",
+    "name": "Computer Organization & Architecture",
+    "track": "Systems",
+    "credits": 3,
+    "difficulty": 3,
+    "semester": 2,
+    "prerequisites": ["CS101"],
+    "keywords": ["cpu", "assembly", "pipelining", "cache", "memory", "instruction set"],
+    "description": "Hardware-software interface, instruction execution cycle, and memory hierarchy."
+  },
+  {
+    "id": "CS301",
+    "name": "Design & Analysis of Algorithms",
+    "track": "Theory",
+    "credits": 4,
+    "difficulty": 4,
+    "semester": 3,
+    "prerequisites": ["CS201", "CS102"],
+    "keywords": ["dynamic programming", "greedy", "divide and conquer", "graph algorithms", "np-completeness"],
+    "description": "Advanced algorithmic design paradigms, amortized analysis, and graph theory."
+  },
+  {
+    "id": "CS302",
+    "name": "Operating Systems",
+    "track": "Systems",
+    "credits": 4,
+    "difficulty": 4,
+    "semester": 3,
+    "prerequisites": ["CS201", "CS202"],
+    "keywords": ["processes", "threads", "concurrency", "virtual memory", "file systems", "deadlocks"],
+    "description": "Process management, memory paging, synchronization primitives, and OS kernel principles."
+  },
+  {
+    "id": "CS303",
+    "name": "Database Management Systems",
+    "track": "Systems",
+    "credits": 3,
+    "difficulty": 2,
+    "semester": 3,
+    "prerequisites": ["CS201"],
+    "keywords": ["sql", "relational algebra", "indexing", "b-trees", "transactions", "acid"],
+    "description": "Relational data modeling, schema design, normalization, query optimization, and transaction recovery."
+  },
+  {
+    "id": "CS304",
+    "name": "Computer Networks",
+    "track": "Systems",
+    "credits": 3,
+    "difficulty": 3,
+    "semester": 4,
+    "prerequisites": ["CS302"],
+    "keywords": ["tcp/ip", "routing", "sockets", "dns", "http", "congestion control"],
+    "description": "Layered network architectures, packet switching, transport reliability, and routing algorithms."
+  },
+  {
+    "id": "CS401",
+    "name": "Artificial Intelligence",
+    "track": "AI/ML",
+    "credits": 4,
+    "difficulty": 4,
+    "semester": 4,
+    "prerequisites": ["CS301"],
+    "keywords": ["search", "heuristics", "a*", "minimax", "knowledge representation", "bayesian networks"],
+    "description": "Intelligent agent architectures, state-space search heuristics, game playing, and reasoning under uncertainty."
+  },
+  {
+    "id": "CS402",
+    "name": "Machine Learning",
+    "track": "AI/ML",
+    "credits": 4,
+    "difficulty": 4,
+    "semester": 5,
+    "prerequisites": ["CS401"],
+    "keywords": ["regression", "classification", "svm", "decision trees", "gradient descent", "evaluation"],
+    "description": "Statistical learning theory, supervised/unsupervised algorithms, and predictive modeling."
+  },
+  {
+    "id": "CS403",
+    "name": "Deep Learning & Neural Networks",
+    "track": "AI/ML",
+    "credits": 4,
+    "difficulty": 5,
+    "semester": 6,
+    "prerequisites": ["CS402"],
+    "keywords": ["cnn", "rnn", "transformers", "backpropagation", "pytorch", "tensors", "attention"],
+    "description": "Modern deep learning architectures, convolutional networks, attention mechanisms, and model training."
+  },
+  {
+    "id": "CS404",
+    "name": "Full Stack Web Engineering",
+    "track": "Web",
+    "credits": 3,
+    "difficulty": 2,
+    "semester": 4,
+    "prerequisites": ["CS101", "CS303"],
+    "keywords": ["javascript", "react", "node", "rest apis", "frontend", "backend", "websockets"],
+    "description": "End-to-end modern web applications, client-server protocols, state management, and cloud hosting."
+  },
+  {
+    "id": "CS405",
+    "name": "Cloud Computing & Distributed Systems",
+    "track": "Systems",
+    "credits": 4,
+    "difficulty": 4,
+    "semester": 5,
+    "prerequisites": ["CS302", "CS304"],
+    "keywords": ["distributed systems", "consensus", "raft", "microservices", "kubernetes", "aws"],
+    "description": "Distributed algorithms, fault tolerance, replication, virtualization, and container orchestration."
+  },
+  {
+    "id": "CS406",
+    "name": "Network Security & Cryptography",
+    "track": "Cybersecurity",
+    "credits": 3,
+    "difficulty": 4,
+    "semester": 5,
+    "prerequisites": ["CS102", "CS304"],
+    "keywords": ["rsa", "aes", "public key", "hashes", "firewalls", "zero trust", "threat modeling"],
+    "description": "Cryptographic primitives, asymmetric encryption, protocol security, and vulnerability assessment."
+  },
+  {
+    "id": "CS407",
+    "name": "Compiler Construction",
+    "track": "Systems",
+    "credits": 4,
+    "difficulty": 5,
+    "semester": 6,
+    "prerequisites": ["CS301", "CS302"],
+    "keywords": ["lexing", "parsing", "ast", "intermediate representation", "code generation", "optimization"],
+    "description": "Lexical analysis, syntax-directed translation, semantic checking, and machine code optimization."
+  },
+  {
+    "id": "CS408",
+    "name": "Natural Language Processing",
+    "track": "AI/ML",
+    "credits": 3,
+    "difficulty": 4,
+    "semester": 6,
+    "prerequisites": ["CS402"],
+    "keywords": ["nlp", "tokenization", "embeddings", "sentiment", "llm", "bert"],
+    "description": "Computational linguistics, text tokenization, dense semantic embeddings, and language generation."
+  }
+]

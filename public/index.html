@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SARS // Smart Academic Recommendation System</title>
+  <meta name="description" content="College DSA-II Project: Smart Academic Recommendation System with C++17 Core Engine (AVL Tree, Graph Algorithms, Max-Heap, Knapsack, MST, LCS).">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <span class="logo-icon">◈</span>
+        <div class="brand-text">
+          <span class="brand-title">SARS</span>
+          <span class="brand-subtitle">Smart Academic Recommendation System</span>
+        </div>
+      </div>
+      <div class="engine-status-badge">
+        <span class="pulse-dot"></span>
+        <span class="engine-label">C++17 Engine Active</span>
+        <span class="engine-latency" id="engineLatency">0 ms</span>
+      </div>
+    </div>
+
+    <!-- Active Student Quick Selector -->
+    <div class="student-quick-select">
+      <label for="activeStudentSelect">Profile:</label>
+      <select id="activeStudentSelect" class="custom-select"></select>
+    </div>
+
+    <!-- Nav Tabs -->
+    <nav class="nav-links">
+      <button class="nav-tab active" data-tab="tab-dashboard" id="btnTabDashboard">
+        <span class="tab-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-tab" data-tab="tab-catalog" id="btnTabCatalog">
+        <span class="tab-icon">📚</span> AVL Catalog
+      </button>
+      <button class="nav-tab" data-tab="tab-paths" id="btnTabPaths">
+        <span class="tab-icon">🧭</span> Learning Paths
+      </button>
+      <button class="nav-tab" data-tab="tab-recommendations" id="btnTabRecommendations">
+        <span class="tab-icon">🎯</span> Max-Heap
+      </button>
+      <button class="nav-tab" data-tab="tab-optimizer" id="btnTabOptimizer">
+        <span class="tab-icon">🎒</span> Elective DP
+      </button>
+      <button class="nav-tab" data-tab="tab-lab" id="btnTabLab">
+        <span class="tab-icon">🔬</span> DSA Lab
+      </button>
+      <button class="nav-tab" data-tab="tab-profile" id="btnTabProfile">
+        <span class="tab-icon">👤</span> Profile Editor
+      </button>
+    </nav>
+  </header>
+
+  <!-- Global Banner / Student Summary Bar -->
+  <section class="student-strip">
+    <div class="student-strip-info">
+      <span class="student-avatar" id="stripAvatar">AS</span>
+      <div class="student-meta">
+        <h2 class="student-name" id="stripName">Aarav Sharma</h2>
+        <p class="student-details" id="stripDetails">B.Tech CSE • Sem 5 • Target: AI Research Scientist</p>
+      </div>
+    </div>
+    <div class="student-strip-stats">
+      <div class="strip-stat">
+        <span class="stat-label">Cumulative GPA</span>
+        <span class="stat-value highlight-cyan" id="stripGpa">3.85 / 4.0</span>
+      </div>
+      <div class="strip-stat">
+        <span class="stat-label">Credit Budget</span>
+        <span class="stat-value highlight-amber" id="stripBudget">12 Credits</span>
+      </div>
+      <div class="strip-stat">
+        <span class="stat-label">Completed Courses</span>
+        <span class="stat-value highlight-green" id="stripCompleted">6 Courses</span>
+      </div>
+      <div class="strip-stat">
+        <span class="stat-label">Track Focus</span>
+        <div class="tag-chips" id="stripInterests"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Application Content Area -->
+  <main class="main-container">
+
+    <!-- 1. DASHBOARD TAB -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="dashboard-hero">
+        <div class="hero-text">
+          <h1>Academic Intelligence & Curriculum Optimization</h1>
+          <p>Powered by native C++17 algorithmic modules: AVL Trees, Adjacency Graph, Max-Heap Recommender, 0/1 Knapsack, Kruskal & Prim MST.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btnQuickRecommend">⚡ Generate Recommendations</button>
+          <button class="btn btn-outline" id="btnOpenPaths">Explore Learning Paths</button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid-4 stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Catalog Courses</span>
+            <span class="badge badge-cyan">AVL Tree</span>
+          </div>
+          <div class="stat-card-body">
+            <div class="stat-number" id="dashTotalCourses">16</div>
+            <div class="stat-sub">Self-balanced BST (Height: <span id="dashTreeHeight">5</span>)</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Available Electives</span>
+            <span class="badge badge-indigo">Max-Heap</span>
+          </div>
+          <div class="stat-card-body">
+            <div class="stat-number" id="dashEligibleCourses">10</div>
+            <div class="stat-sub">Prerequisites verified & ranked</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Shortest Path Engine</span>
+            <span class="badge badge-purple">BFS / Dijkstra</span>
+          </div>
+          <div class="stat-card-body">
+            <div class="stat-number">O(V + E log V)</div>
+            <div class="stat-sub">Fewest hops vs Min effort</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-title">Elective Budget Optimizer</span>
+            <span class="badge badge-emerald">0/1 Knapsack</span>
+          </div>
+          <div class="stat-card-body">
+            <div class="stat-number" id="dashKnapsackOptimal">180 Pts</div>
+            <div class="stat-sub">DP optimal credit allocation</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Split: Top Recommendations & Fast Path Finder -->
+      <div class="grid-2-3 dashboard-split">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="icon">🎯</span> Top Ranked Recommendations
+            </div>
+            <span class="badge badge-cyan">C++ Max-Heap</span>
+          </div>
+          <div class="panel-body" id="dashTopRecommendations">
+            <div class="loading-state">Loading recommendations from C++ engine...</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span class="icon">🧭</span> Quick Pathway Analysis
+            </div>
+            <span class="badge badge-indigo">Graph Theory</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Compare the fewest-prerequisite hop path (BFS) with the lowest cognitive difficulty path (Dijkstra) between any two courses.</p>
+            <div class="quick-path-form">
+              <div class="form-group">
+                <label for="dashPathStart">From (Foundational):</label>
+                <select id="dashPathStart" class="custom-select"></select>
+              </div>
+              <div class="form-group">
+                <label for="dashPathTarget">To (Advanced):</label>
+                <select id="dashPathTarget" class="custom-select"></select>
+              </div>
+              <button class="btn btn-primary btn-block" id="btnDashComputePath">Analyze Path Traversal</button>
+            </div>
+            <div id="dashPathResult" class="path-result-box" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. COURSE CATALOG (AVL TREE) TAB -->
+    <div class="tab-content" id="tab-catalog">
+      <div class="section-header">
+        <div>
+          <h2>AVL Tree Course Catalog</h2>
+          <p class="section-desc">Courses are indexed in a self-balancing AVL Binary Search Tree. Operations run in strict O(log N) time with balance factors ∈ {-1, 0, +1}.</p>
+        </div>
+        <div class="avl-controls">
+          <input type="text" id="avlSearchInput" class="custom-input" placeholder="Search Course ID (e.g. CS301)...">
+          <button class="btn btn-primary" id="btnAvlSearch">AVL Search</button>
+          <button class="btn btn-outline" id="btnAvlReset">Show All (In-Order)</button>
+        </div>
+      </div>
+
+      <!-- Range Query Bar -->
+      <div class="avl-range-bar">
+        <span class="range-title">AVL Range Search [Low, High]:</span>
+        <input type="text" id="avlRangeLow" class="custom-input input-sm" value="CS200" placeholder="Low ID">
+        <span class="range-sep">to</span>
+        <input type="text" id="avlRangeHigh" class="custom-input input-sm" value="CS405" placeholder="High ID">
+        <button class="btn btn-secondary btn-sm" id="btnAvlRange">Filter Range</button>
+        <button class="btn btn-outline btn-sm" id="btnToggleTreeVisual">Toggle Visual Tree Hierarchy</button>
+      </div>
+
+      <!-- AVL Tree Visual Hierarchy Diagram -->
+      <div class="panel visual-tree-panel" id="visualTreePanel" style="display: none;">
+        <div class="panel-header">
+          <div class="panel-title">🌲 AVL Tree Balanced Structure</div>
+          <span class="badge badge-purple" id="avlTreeMeta">Height: 5 • Balance Factor Verified</span>
+        </div>
+        <div class="panel-body">
+          <div class="tree-container" id="avlTreeVisualContainer"></div>
+        </div>
+      </div>
+
+      <!-- Course Cards Grid -->
+      <div class="catalog-grid" id="catalogGrid">
+        <div class="loading-state">Traversing AVL tree in-order...</div>
+      </div>
+    </div>
+
+    <!-- 3. LEARNING PATHS (BFS VS DIJKSTRA) TAB -->
+    <div class="tab-content" id="tab-paths">
+      <div class="section-header">
+        <div>
+          <h2>Academic Graph & Learning Pathway Analysis</h2>
+          <p class="section-desc">Interactive curriculum directed graph. Compare unweighted shortest edge count (BFS) vs minimum difficulty effort (Dijkstra).</p>
+        </div>
+        <div class="path-controls-bar">
+          <div class="control-item">
+            <label for="pathSelectSource">Source Course:</label>
+            <select id="pathSelectSource" class="custom-select"></select>
+          </div>
+          <div class="control-item">
+            <label for="pathSelectTarget">Target Specialization:</label>
+            <select id="pathSelectTarget" class="custom-select"></select>
+          </div>
+          <button class="btn btn-primary" id="btnRunLearningPath">Compute Path Comparison</button>
+        </div>
+      </div>
+
+      <!-- Graph Canvas Container -->
+      <div class="graph-viewport-panel">
+        <div class="canvas-header">
+          <div class="canvas-legend">
+            <span class="legend-item"><span class="legend-node node-core"></span> Core</span>
+            <span class="legend-item"><span class="legend-node node-ai"></span> AI/ML</span>
+            <span class="legend-item"><span class="legend-node node-systems"></span> Systems</span>
+            <span class="legend-item"><span class="legend-node node-web"></span> Web</span>
+            <span class="legend-item"><span class="legend-node node-cyber"></span> Cybersecurity</span>
+            <span class="legend-item"><span class="legend-node node-theory"></span> Theory</span>
+            <span class="legend-item"><span class="legend-line line-bfs"></span> BFS Path (Cyan)</span>
+            <span class="legend-item"><span class="legend-line line-dijkstra"></span> Dijkstra Path (Amber)</span>
+          </div>
+          <div class="canvas-tools">
+            <button class="btn btn-xs btn-outline" id="btnResetGraphView">Reset Zoom/Pan</button>
+          </div>
+        </div>
+        <div class="canvas-wrapper">
+          <canvas id="academicGraphCanvas" width="1100" height="520"></canvas>
+        </div>
+      </div>
+
+      <!-- Comparison Metrics Cards -->
+      <div class="grid-2 path-comparison-cards">
+        <div class="comparison-card bfs-card">
+          <div class="comp-header">
+            <h3>Breadth-First Search (BFS)</h3>
+            <span class="badge badge-cyan">Fewest Edge Hops</span>
+          </div>
+          <div class="comp-body" id="bfsDetailsBox">
+            <p class="comp-metric">Edge Hops: <strong id="bfsEdgeCount">-</strong></p>
+            <p class="comp-metric">Nodes Visited: <strong id="bfsNodesVisited">-</strong></p>
+            <div class="path-sequence" id="bfsPathSequence">Select source and target to compute BFS path.</div>
+          </div>
+        </div>
+
+        <div class="comparison-card dijkstra-card">
+          <div class="comp-header">
+            <h3>Dijkstra's Algorithm</h3>
+            <span class="badge badge-amber">Minimum Difficulty Effort</span>
+          </div>
+          <div class="comp-body" id="dijkstraDetailsBox">
+            <p class="comp-metric">Total Effort Score: <strong id="dijkstraTotalEffort">-</strong></p>
+            <p class="comp-metric">Min-PQ Extract Ops: <strong id="dijkstraNodesVisited">-</strong></p>
+            <div class="path-sequence" id="dijkstraPathSequence">Select source and target to compute Dijkstra path.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. RECOMMENDATIONS (MAX-HEAP) TAB -->
+    <div class="tab-content" id="tab-recommendations">
+      <div class="section-header">
+        <div>
+          <h2>Max-Heap Course Recommendation Engine</h2>
+          <p class="section-desc">Eligible courses are prioritized using a real binary Max-Heap with transparent heuristic scoring (interests, GPA rigor, prerequisite readiness, budget efficiency).</p>
+        </div>
+        <div class="heap-controls">
+          <button class="btn btn-primary" id="btnRefreshRecs">Re-evaluate Max-Heap</button>
+        </div>
+      </div>
+
+      <!-- Heap Visual Representation -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">🏆 Top Recommended Electives for Enrollment</div>
+          <span class="badge badge-emerald" id="heapMetaBadge">Extracted in O(K log N) time</span>
+        </div>
+        <div class="panel-body">
+          <div class="recommendations-container" id="recommendationsList">
+            <div class="loading-state">Extracting highest-priority courses from Max-Heap...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Locked / Missing Prerequisite Courses -->
+      <div class="panel mt-4">
+        <div class="panel-header">
+          <div class="panel-title">🔒 Locked Specialization Courses (Prerequisites Missing)</div>
+          <span class="badge badge-rose">Prerequisite Gating</span>
+        </div>
+        <div class="panel-body">
+          <p class="panel-desc">These courses match student career interests but cannot be taken yet. Complete their prerequisite chain to unlock enrollment.</p>
+          <div class="locked-courses-grid" id="lockedCoursesList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ELECTIVE OPTIMIZER (0/1 KNAPSACK) TAB -->
+    <div class="tab-content" id="tab-optimizer">
+      <div class="section-header">
+        <div>
+          <h2>Elective Optimization (0/1 Knapsack DP)</h2>
+          <p class="section-desc">Solves the discrete 0/1 Knapsack problem where course credits represent weight and academic relevance represents value, constrained by the student credit budget.</p>
+        </div>
+        <div class="budget-slider-box">
+          <label for="knapsackBudgetInput">Elective Credit Budget (W): <strong id="budgetSliderVal">12</strong> credits</label>
+          <input type="range" id="knapsackBudgetInput" min="3" max="24" value="12" class="custom-slider">
+        </div>
+      </div>
+
+      <!-- Knapsack Solution Cards -->
+      <div class="grid-3 knapsack-summary-grid">
+        <div class="summary-metric-card">
+          <span class="metric-label">Max Cumulative Benefit</span>
+          <span class="metric-val highlight-cyan" id="knapMaxBenefit">-</span>
+          <span class="metric-note">Dynamic programming global optimum</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="metric-label">Credits Allocated</span>
+          <span class="metric-val highlight-amber" id="knapCreditsUsed">-</span>
+          <span class="metric-note">Within specified budget ceiling</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="metric-label">Algorithm Complexity</span>
+          <span class="metric-val highlight-emerald">O(N × W)</span>
+          <span class="metric-note">Exact pseudo-polynomial DP</span>
+        </div>
+      </div>
+
+      <div class="grid-2 knapsack-details-split">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">✅ Selected Optimal Elective Bundle</div>
+            <span class="badge badge-cyan" id="knapSelectedCount">0 Selected</span>
+          </div>
+          <div class="panel-body" id="knapSelectedCourses"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📊 2D Dynamic Programming Table State</div>
+            <span class="badge badge-purple">dp[i][w]</span>
+          </div>
+          <div class="panel-body">
+            <div class="dp-table-container" id="knapDpTableContainer">
+              <div class="loading-state">Computing 2D DP matrix...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. DSA LAB (INTERACTIVE WORKBENCH & VIVA REFERENCE) TAB -->
+    <div class="tab-content" id="tab-lab">
+      <div class="section-header">
+        <div>
+          <h2>Interactive DSA Lab & Academic Algorithm Workbench</h2>
+          <p class="section-desc">Run, inspect, and test each core DSA-II algorithm with custom inputs. Includes time complexities, explanations, and viva discussion points.</p>
+        </div>
+      </div>
+
+      <!-- Lab Algorithm Subtabs -->
+      <div class="lab-subtabs">
+        <button class="lab-tab-btn active" data-subtab="lab-lcs">LCS Syllabus Matcher</button>
+        <button class="lab-tab-btn" data-subtab="lab-resource">Resource Allocation DP</button>
+        <button class="lab-tab-btn" data-subtab="lab-mst">Kruskal vs Prim MST</button>
+        <button class="lab-tab-btn" data-subtab="lab-bf-fw">Bellman-Ford & Floyd-Warshall</button>
+        <button class="lab-tab-btn" data-subtab="lab-viva">Viva & DSA Theory Guide</button>
+      </div>
+
+      <!-- Subtab 1: LCS -->
+      <div class="lab-subtab-content active" id="lab-lcs">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Longest Common Subsequence (LCS) Topic Similarity</div>
+            <span class="badge badge-cyan">DP • O(M × N)</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Aligns student career keywords or goal topics with course syllabus strings using 2D Dynamic Programming.</p>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="lcsInput1">Student Target Topics (String 1):</label>
+                <input type="text" id="lcsInput1" class="custom-input" value="DEEP NEURAL NETWORKS COMPUTER VISION">
+              </div>
+              <div class="form-group">
+                <label for="lcsInput2">Course Syllabus Topics (String 2):</label>
+                <input type="text" id="lcsInput2" class="custom-input" value="NEURAL NETWORKS TRANSFORMERS VISION">
+              </div>
+            </div>
+            <button class="btn btn-primary mt-2" id="btnRunLcs">Execute LCS Dynamic Programming</button>
+
+            <div class="lcs-output-box mt-4" id="lcsOutputBox" style="display: none;">
+              <div class="grid-3 mb-3">
+                <div class="mini-stat">LCS Length: <strong id="lcsLenVal">0</strong></div>
+                <div class="mini-stat">Matching Sequence: <strong id="lcsSubseqVal"></strong></div>
+                <div class="mini-stat">Similarity Index: <strong id="lcsSimilarityVal">0%</strong></div>
+              </div>
+              <h4>DP Matrix Preview (First 15×15):</h4>
+              <div class="dp-matrix-preview" id="lcsMatrixContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 2: Resource Allocation DP -->
+      <div class="lab-subtab-content" id="lab-resource">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Resource Allocation DP: Multi-Stage Study Time Scheduling</div>
+            <span class="badge badge-emerald">Multi-Stage DP • O(N × H²)</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Optimally allocates weekly study hours across enrolled courses having varying difficulties to maximize aggregate mastery under diminishing marginal returns.</p>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="resAllocHours">Total Available Study Hours (H):</label>
+                <input type="number" id="resAllocHours" class="custom-input" value="24" min="4" max="60">
+              </div>
+              <div class="form-group">
+                <label>Active Subject Roster:</label>
+                <div class="static-val">Operating Systems (Diff 4), Algorithms (Diff 4), Machine Learning (Diff 4), Full Stack (Diff 2)</div>
+              </div>
+            </div>
+            <button class="btn btn-primary mt-2" id="btnRunResAlloc">Calculate Optimal Allocation</button>
+
+            <div class="res-output-box mt-4" id="resAllocOutputBox" style="display: none;">
+              <div class="mini-stat mb-3">Projected Knowledge Gain Score: <strong id="resAllocGain">0</strong></div>
+              <div class="allocations-table-wrap" id="resAllocTableWrap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 3: MST -->
+      <div class="lab-subtab-content" id="lab-mst">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Minimum Spanning Tree (MST): Kruskal's vs Prim's Algorithm</div>
+            <span class="badge badge-amber">Greedy Graph Optimization</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Finds the minimum-cost academic prerequisite backbone network connecting all courses without cycles. Compares Disjoint Set Union (Kruskal) with Priority Queue (Prim).</p>
+            <button class="btn btn-primary" id="btnRunMstCompare">Run Kruskal & Prim Comparison</button>
+
+            <div class="mst-results-grid mt-4" id="mstResultsGrid" style="display: none;">
+              <div class="mst-column kruskal-column">
+                <div class="column-title">
+                  <h4>Kruskal's Algorithm</h4>
+                  <span class="badge badge-cyan">DSU with Union-by-Rank</span>
+                </div>
+                <div class="mst-stats">
+                  <p>Total Weight: <strong id="kruskalWeight">0</strong></p>
+                  <p>MST Edges: <strong id="kruskalEdges">0</strong></p>
+                  <p>Cycle Rejections: <strong id="kruskalCycles">0</strong></p>
+                </div>
+                <div class="mst-edges-list" id="kruskalEdgesList"></div>
+              </div>
+
+              <div class="mst-column prim-column">
+                <div class="column-title">
+                  <h4>Prim's Algorithm</h4>
+                  <span class="badge badge-purple">Min-Priority Queue</span>
+                </div>
+                <div class="mst-stats">
+                  <p>Total Weight: <strong id="primWeight">0</strong></p>
+                  <p>MST Edges: <strong id="primEdges">0</strong></p>
+                  <p>Start Vertex: <strong id="primStart">CS101</strong></p>
+                </div>
+                <div class="mst-edges-list" id="primEdgesList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 4: Bellman-Ford & Floyd-Warshall -->
+      <div class="lab-subtab-content" id="lab-bf-fw">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Bellman-Ford & Floyd-Warshall Dynamic Graph Analysis</div>
+            <span class="badge badge-rose">All-Pairs & Negative Cycle Detection</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Bellman-Ford relaxes edges V-1 times to find single-source distances with negative cycle checking. Floyd-Warshall computes all-pairs shortest paths in O(V³).</p>
+            <button class="btn btn-primary" id="btnRunAdvancedGraph">Execute Bellman-Ford & Floyd-Warshall</button>
+
+            <div class="advanced-graph-results mt-4" id="advGraphResults" style="display: none;">
+              <div class="grid-2">
+                <div class="adv-box">
+                  <h4>Bellman-Ford Results (Source: CS101)</h4>
+                  <p>Negative Weight Cycles Detected: <strong id="bfCycleStatus" class="highlight-green">None (DAG Verified)</strong></p>
+                  <div class="code-block-scroll" id="bfDistancesBox"></div>
+                </div>
+
+                <div class="adv-box">
+                  <h4>Floyd-Warshall All-Pairs Distance Matrix</h4>
+                  <p class="note">Dynamic programming formulation: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])</p>
+                  <div class="table-scroll-wrap" id="fwMatrixWrap"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subtab 5: Viva Reference Guide -->
+      <div class="lab-subtab-content" id="lab-viva">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">College DSA-II Viva Questions & Algorithmic Defense</div>
+            <span class="badge badge-emerald">Examination Ready</span>
+          </div>
+          <div class="panel-body viva-content">
+            <div class="viva-qa">
+              <h3>Q1: Why use an AVL Tree for course catalog indexing over standard BST or Hash Table?</h3>
+              <p><strong>Answer:</strong> An ordinary BST can degenerate into a linked list with O(N) worst-case time for sorted insertions (e.g. course codes inserted chronologically). An AVL Tree strictly enforces a balance factor ∈ {-1, 0, +1} through 4 rotation cases (LL, RR, LR, RL), guaranteeing strict O(log N) worst-case search, insertion, and deletion. Unlike a Hash Table, the AVL Tree maintains elements in sorted order, enabling efficient in-order traversal and range queries [CS200, CS400] without sorting overhead.</p>
+            </div>
+
+            <div class="viva-qa">
+              <h3>Q2: Why compare BFS and Dijkstra for learning paths?</h3>
+              <p><strong>Answer:</strong> BFS operates on unweighted graphs and computes the shortest path in terms of the minimum number of edge hops (i.e. fewest prerequisite course stages, O(V + E)). However, a course hop may have varying academic difficulty or workload. Dijkstra's algorithm uses a Min-Priority Queue to minimize the cumulative cognitive effort weight (O((V + E) log V)), providing students with the most manageable learning curve even if it contains more intermediate foundational steps.</p>
+            </div>
+
+            <div class="viva-qa">
+              <h3>Q3: How does the Max-Heap prioritize course recommendations?</h3>
+              <p><strong>Answer:</strong> The Max-Heap stores candidate courses keyed by a multi-criteria heuristic score combining track interest alignment (up to 40 pts), student GPA rigor fit (up to 25 pts), prerequisite readiness (15 pts bonus for fully unlocked courses), and credit budget compatibility. The top-K courses can be extracted in O(K log N) time, which is significantly faster than sorting all N courses (O(N log N)) when K << N.</p>
+            </div>
+
+            <div class="viva-qa">
+              <h3>Q4: Explain the 0/1 Knapsack formulation for elective optimization.</h3>
+              <p><strong>Answer:</strong> Each elective course has an integral weight (credits) and a value (composite academic benefit score). The student credit budget acts as the knapsack capacity W. Since each course can only be enrolled once (0 or 1), the problem satisfies optimal substructure: <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w - wt[i]] + val[i])</code>. The optimal set is reconstructed via backtracking from <code>dp[N][W]</code> in O(N × W) time.</p>
+            </div>
+
+            <div class="viva-qa">
+              <h3>Q5: What is the difference between Kruskal's and Prim's MST algorithms?</h3>
+              <p><strong>Answer:</strong> Kruskal's algorithm is edge-based: it sorts all edges and uses Disjoint Set Union (DSU) with path compression and union-by-rank to greedily add edges without forming cycles (O(E log E)). Prim's algorithm is vertex-based: it starts at an arbitrary vertex and greedily grows a connected component using a Min-Priority Queue (O((V + E) log V)). Both yield identical minimum total weight, as demonstrated in our test suite.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. STUDENT PROFILE MANAGER TAB -->
+    <div class="tab-content" id="tab-profile">
+      <div class="section-header">
+        <div>
+          <h2>Student Profile & Parameters Manager</h2>
+          <p class="section-desc">Edit student GPA, target career, elective credit budget, and completed courses. Watch how the C++ Max-Heap and Knapsack dynamically adapt recommendations in real time.</p>
+        </div>
+        <div>
+          <button class="btn btn-primary" id="btnSaveProfile">Save Profile & Re-run DSA</button>
+        </div>
+      </div>
+
+      <div class="grid-2 profile-editor-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Academic Parameters</div>
+            <span class="badge badge-cyan">Student Metadata</span>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label for="profName">Student Name:</label>
+              <input type="text" id="profName" class="custom-input">
+            </div>
+            <div class="form-group">
+              <label for="profProgram">Academic Program:</label>
+              <input type="text" id="profProgram" class="custom-input">
+            </div>
+            <div class="grid-2">
+              <div class="form-group">
+                <label for="profGpa">Cumulative GPA (0.0 - 4.0):</label>
+                <input type="number" id="profGpa" class="custom-input" step="0.05" min="1.0" max="4.0">
+              </div>
+              <div class="form-group">
+                <label for="profBudget">Elective Credit Budget:</label>
+                <input type="number" id="profBudget" class="custom-input" min="3" max="24">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="profTargetCareer">Target Career / Specialization:</label>
+              <input type="text" id="profTargetCareer" class="custom-input">
+            </div>
+            <div class="form-group">
+              <label>Interest Tracks (Select all that apply):</label>
+              <div class="track-checkboxes" id="profInterestsBox">
+                <label><input type="checkbox" value="AI/ML"> AI/ML</label>
+                <label><input type="checkbox" value="Systems"> Systems</label>
+                <label><input type="checkbox" value="Web"> Web</label>
+                <label><input type="checkbox" value="Cybersecurity"> Cybersecurity</label>
+                <label><input type="checkbox" value="Theory"> Theory</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Completed Prerequisites Roster</div>
+            <span class="badge badge-emerald">Graph Visited State</span>
+          </div>
+          <div class="panel-body">
+            <p class="panel-desc">Check the courses this student has already passed to unlock downstream dependent courses:</p>
+            <div class="completed-courses-checklist" id="profCompletedBox"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toastNotification" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

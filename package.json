@@ -1,0 +1,16 @@
+{
+  "name": "smart-academic-recommendation-system",
+  "version": "1.0.0",
+  "description": "Smart Academic Recommendation System (SARS) - College DSA-II Project with C++17 Core Engine",
+  "scripts": {
+    "build:cpp": "cd cpp_engine && ./build.sh",
+    "test:cpp": "cd cpp_engine && make test",
+    "install:server": "cd server && npm install",
+    "start": "node server/server.js",
+    "dev": "node server/server.js",
+    "test:api": "node server/test_api.js",
+    "test": "npm run test:cpp && npm run test:api"
+  },
+  "author": "Utkarsh Gupta (UtkarshGupta19)",
+  "license": "MIT"
+}

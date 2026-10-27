@@ -1,0 +1,50 @@
+[
+  {
+    "id": "STU101",
+    "name": "Aarav Sharma",
+    "program": "B.Tech Computer Science & Engineering",
+    "semester": 5,
+    "gpa": 3.85,
+    "creditBudget": 12,
+    "targetCareer": "AI Research Scientist / ML Engineer",
+    "interests": ["AI/ML", "Theory"],
+    "completedCourses": ["CS101", "CS102", "CS201", "CS202", "CS301", "CS401"],
+    "targetTopics": "Deep Learning Neural Networks Computer Vision Transformers"
+  },
+  {
+    "id": "STU102",
+    "name": "Priya Patel",
+    "program": "B.Tech Computer Science & Engineering",
+    "semester": 5,
+    "gpa": 3.35,
+    "creditBudget": 10,
+    "targetCareer": "Cloud Solutions Architect / Full Stack Lead",
+    "interests": ["Systems", "Web"],
+    "completedCourses": ["CS101", "CS102", "CS201", "CS202", "CS302", "CS303"],
+    "targetTopics": "Distributed Systems Cloud Kubernetes Microservices Full Stack Web"
+  },
+  {
+    "id": "STU103",
+    "name": "Rohan Mehta",
+    "program": "B.Tech Information Technology",
+    "semester": 4,
+    "gpa": 2.90,
+    "creditBudget": 8,
+    "targetCareer": "Cybersecurity Analyst / Network Engineer",
+    "interests": ["Cybersecurity", "Systems"],
+    "completedCourses": ["CS101", "CS102", "CS201", "CS202"],
+    "targetTopics": "Network Security Cryptography Firewalls Threat Modeling"
+  },
+  {
+    "id": "STU104",
+    "name": "Ananya Iyer",
+    "program": "B.Tech Computer Science (Honors)",
+    "semester": 6,
+    "gpa": 3.95,
+    "creditBudget": 14,
+    "targetCareer": "Algorithmic Systems & Compiler Engineer",
+    "interests": ["Systems", "Theory"],
+    "completedCourses": ["CS101", "CS102", "CS201", "CS202", "CS301", "CS302", "CS303"],
+    "targetTopics": "Compiler Construction Optimization AST Parsing Graph Algorithms"
+  }
+]
