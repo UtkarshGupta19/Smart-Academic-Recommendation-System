@@ -1,5 +1,12 @@
 # 🎓 SARS // Smart Academic Recommendation System
-### College DSA-II Capstone Project | Full-Stack Algorithmic Engine
+### College DSA-II Capstone Project | Full-Stack C++17 Algorithmic Engine
+
+**Course:** Data Structures and Algorithms – II (`BCSE0401`)  
+**Student:** Utkarsh Kumar Gupta (Roll No: `2501330100396`)  
+**Institution:** NIET Greater Noida (B.Tech CSE)  
+**Faculty Evaluator:** Mr. Shamshad Ali  
+**SDG Focus:** SDG 4 – Quality Education  
+**GitHub:** [@UtkarshGupta19](https://github.com/UtkarshGupta19)
 
 [![C++17](https://img.shields.io/badge/Language-C%2B%2B17-00599C?logo=c%2B%2B)](https://en.cppreference.com/w/cpp/17)
 [![Node.js](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-339933?logo=node.js)](https://nodejs.org/)
@@ -11,9 +18,9 @@
 
 ## 📌 Executive Summary
 
-**Smart Academic Recommendation System (SARS)** is a college Data Structures & Algorithms II (DSA-II) project built from the ground up without third-party algorithm libraries, external black-box cloud AI, or paid APIs. 
+**Smart Academic Recommendation System (SARS)** is an end-to-end college Data Structures & Algorithms II (DSA-II) capstone project engineered from scratch without third-party algorithm libraries, external black-box cloud AI, or paid APIs. 
 
-All core decision models, graph traversals, balancing routines, and combinatorial optimizations are written in **pure C++17** and compiled as a standalone native binary (`sars_engine`). A lightweight **Node.js + Express** middleware layer executes the C++ engine safely via bidirectional JSON streaming, serving an interactive **Dark Navy & Cyan** academic dashboard with real-time graph visualizations and an interactive algorithmic laboratory.
+All core decision models, graph traversals, tree balancing routines, and combinatorial optimizations are written in **pure C++17** and compiled as a standalone native binary (`sars_engine`). A lightweight **Node.js + Express** middleware layer executes the C++ engine safely via bidirectional JSON streaming, serving an interactive **Dark Navy & Cyan** academic dashboard with real-time prerequisite graph visualizations and an interactive algorithmic laboratory. The repository also preserves the initial standalone Python CLI prototype (`prototype_sars.py`).
 
 ---
 
@@ -38,7 +45,7 @@ graph TD
 ## 🧠 Core DSA Implementations & Theoretical Logic
 
 ### 1. Self-Balancing AVL Tree (`AVLTree.hpp`)
-* **Purpose**: Course catalog storage, exact O(log N) lookup, in-order sorted traversal, and range filtering `[lowId, highId]`.
+* **Purpose**: Course catalog storage, exact $O(\log N)$ lookup, in-order sorted traversal, and range filtering `[lowId, highId]`.
 * **Balancing Invariant**: For every node $u$, the balance factor $\text{BF}(u) = \text{height}(u.\text{left}) - \text{height}(u.\text{right}) \in \{-1, 0, +1\}$.
 * **Rotations**:
   * **Left-Left (LL)**: Single Right Rotation.
@@ -178,6 +185,11 @@ Open your browser at: **`http://localhost:3000`**
    npm start
    ```
 
+5. **Run Standalone Python Prototype (Optional)**:
+   ```bash
+   python3 prototype_sars.py
+   ```
+
 ---
 
 ## 🎯 Viva Examination Questions & Model Answers
@@ -231,6 +243,7 @@ Smart-Academic-Recommendation-System/
 │   ├── index.html                  # Responsive multi-tab dashboard layout
 │   ├── styles.css                  # Dark Navy & Cyan design system
 │   └── app.js                      # Canvas visualizer and lab controller
+├── prototype_sars.py               # Standalone Python CLI prototype (preserved)
 ├── run.sh                          # 1-click startup script
 ├── package.json                    # Workspace npm scripts
 ├── .gitignore                      # Git ignore rules
@@ -240,5 +253,6 @@ Smart-Academic-Recommendation-System/
 ---
 
 ## 👤 Author
-* **Utkarsh Gupta** ([@UtkarshGupta19](https://github.com/UtkarshGupta19))
-* College DSA-II Capstone Project
+* **Utkarsh Kumar Gupta** ([@UtkarshGupta19](https://github.com/UtkarshGupta19))
+* Roll No: `2501330100396` | NIET Greater Noida (B.Tech CSE)
+* Course: Data Structures and Algorithms – II (`BCSE0401`)
