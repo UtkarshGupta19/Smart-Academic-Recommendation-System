@@ -217,6 +217,9 @@
         <button class="btn btn-outline btn-sm" id="btnToggleTreeVisual">Toggle Visual Tree Hierarchy</button>
       </div>
 
+      <!-- Search Path Result Banner -->
+      <div id="avlSearchPathBanner" class="search-path-box mb-3" style="display: none;"></div>
+
       <!-- AVL Tree Visual Hierarchy Diagram -->
       <div class="panel visual-tree-panel" id="visualTreePanel" style="display: none;">
         <div class="panel-header">
@@ -286,7 +289,10 @@
           <div class="comp-body" id="bfsDetailsBox">
             <p class="comp-metric">Edge Hops: <strong id="bfsEdgeCount">-</strong></p>
             <p class="comp-metric">Nodes Visited: <strong id="bfsNodesVisited">-</strong></p>
+            <div class="path-label">Shortest Degree Pathway:</div>
             <div class="path-sequence" id="bfsPathSequence">Select source and target to compute BFS path.</div>
+            <div class="path-label">Queue FIFO Exploration Order:</div>
+            <div class="path-visited-order" id="bfsVisitedSequence">-</div>
           </div>
         </div>
 
@@ -298,7 +304,10 @@
           <div class="comp-body" id="dijkstraDetailsBox">
             <p class="comp-metric">Total Effort Score: <strong id="dijkstraTotalEffort">-</strong></p>
             <p class="comp-metric">Min-PQ Extract Ops: <strong id="dijkstraNodesVisited">-</strong></p>
+            <div class="path-label">Minimum Workload Pathway:</div>
             <div class="path-sequence" id="dijkstraPathSequence">Select source and target to compute Dijkstra path.</div>
+            <div class="path-label">Min-Priority Queue Extraction Order:</div>
+            <div class="path-visited-order" id="dijkstraVisitedSequence">-</div>
           </div>
         </div>
       </div>
@@ -313,6 +322,21 @@
         </div>
         <div class="heap-controls">
           <button class="btn btn-primary" id="btnRefreshRecs">Re-evaluate Max-Heap</button>
+          <button class="btn btn-outline" id="btnToggleHeapDebug">🔍 Inspect C++ Binary Max-Heap Array & Extraction Steps</button>
+        </div>
+      </div>
+
+      <!-- Binary Max-Heap Array & Extraction Log Panel -->
+      <div class="panel mb-4" id="heapDebugPanel" style="display: none;">
+        <div class="panel-header">
+          <div class="panel-title">🌳 Binary Max-Heap Array Invariant & Extraction Steps</div>
+          <span class="badge badge-purple" id="heapArrayMeta">Array Representation: parent(i) ≥ child</span>
+        </div>
+        <div class="panel-body">
+          <p class="panel-desc">Direct C++ memory vector representation of the binary Max-Heap before extraction, followed by the O(log N) heapifyDown trace for each extracted course.</p>
+          <div class="heap-array-view mb-3" id="heapArrayContainer"></div>
+          <h4>Step-by-Step Heap Extraction Sequence (O(K log N)):</h4>
+          <div class="heap-extraction-steps" id="heapExtractionContainer"></div>
         </div>
       </div>
 
@@ -486,8 +510,10 @@
             <span class="badge badge-amber">Greedy Graph Optimization</span>
           </div>
           <div class="panel-body">
-            <p class="panel-desc">Finds the minimum-cost academic prerequisite backbone network connecting all courses without cycles. Compares Disjoint Set Union (Kruskal) with Priority Queue (Prim).</p>
             <button class="btn btn-primary" id="btnRunMstCompare">Run Kruskal & Prim Comparison</button>
+
+            <!-- Prominent MST Invariant Verification Banner -->
+            <div id="mstVerificationBanner" class="mst-verification-badge mt-3" style="display: none;"></div>
 
             <div class="mst-results-grid mt-4" id="mstResultsGrid" style="display: none;">
               <div class="mst-column kruskal-column">

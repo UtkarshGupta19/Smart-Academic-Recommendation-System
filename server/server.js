@@ -320,16 +320,18 @@ app.get('/api/graph/algorithms', async (req, res) => {
     const edges = buildGraphEdges(coursesData);
     const startNode = req.query.start || 'CS101';
 
-    const [dfs, bellmanFord, connected] = await Promise.all([
+    const [dfs, bellmanFord, connected, floydWarshall] = await Promise.all([
       runCppEngine('graph_dfs', { courses: coursesData, edges, start: startNode }),
       runCppEngine('graph_bellman_ford', { courses: coursesData, edges, start: startNode }),
-      runCppEngine('graph_connected', { courses: coursesData, edges })
+      runCppEngine('graph_connected', { courses: coursesData, edges }),
+      runCppEngine('graph_floyd_warshall', { courses: coursesData, edges })
     ]);
 
     res.json({
       dfs,
       bellmanFord,
       connected,
+      floydWarshall,
       graphVisual: {
         nodes: coursesData,
         edges

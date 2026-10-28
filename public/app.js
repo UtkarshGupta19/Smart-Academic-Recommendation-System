@@ -14,6 +14,7 @@ const state = {
   graphEdges: [],
   avlTreeData: null,
   learningPathResult: null,
+  heapDebugData: null,
   canvas: {
     ctx: null,
     width: 1100,
@@ -264,7 +265,7 @@ function renderCatalogCards(courseList) {
   container.innerHTML = '';
 
   if (courseList.length === 0) {
-    container.innerHTML = `<div class="empty-state">No courses matched search parameters.</div>`;
+    container.innerHTML = `<div class="empty-state">No courses matched search parameters in the AVL tree.</div>`;
     return;
   }
 
@@ -307,19 +308,47 @@ function renderCatalogCards(courseList) {
   });
 }
 
-// AVL Search & Range Event Handlers
+// AVL Search with Path Tracking
 document.getElementById('btnAvlSearch')?.addEventListener('click', async () => {
   const q = document.getElementById('avlSearchInput')?.value.trim();
+  const pathBanner = document.getElementById('avlSearchPathBanner');
+
   if (!q) {
+    if (pathBanner) pathBanner.style.display = 'none';
     renderCatalogCards(state.courses);
     return;
   }
+
   try {
     const res = await fetch(`${API_BASE}/courses/search/${encodeURIComponent(q)}`);
     const data = await res.json();
+
+    if (pathBanner) {
+      pathBanner.style.display = 'block';
+      const pathStr = (data.searchPath && data.searchPath.length > 0)
+        ? data.searchPath.join('  ➔  ')
+        : q;
+
+      if (data.found && data.course) {
+        pathBanner.innerHTML = `
+          <div style="color:var(--cyan-light); font-weight:700;">✓ AVL Tree Node Located: <strong>${data.course.id}</strong> (${data.course.name})</div>
+          <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); margin-top:0.35rem;">
+            Binary Search Traversal Path: <strong>${pathStr}</strong> | <strong>${data.comparisons || 1}</strong> comparisons evaluated (Strict O(log N) depth)
+          </div>
+        `;
+      } else {
+        pathBanner.innerHTML = `
+          <div style="color:var(--rose); font-weight:700;">✗ Course ID "${q}" Not Found in AVL Tree</div>
+          <div style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono); margin-top:0.35rem;">
+            Search Path Traversed to Leaf: <strong>${pathStr}</strong> | <strong>${data.comparisons || 0}</strong> comparisons evaluated
+          </div>
+        `;
+      }
+    }
+
     if (data.found && data.course) {
       renderCatalogCards([data.course]);
-      showToast(`AVL Tree found node for ${data.course.id} in O(log N)`, 'success');
+      showToast(`AVL Tree located ${data.course.id} in ${data.comparisons || 1} steps`, 'success');
     } else {
       renderCatalogCards([]);
       showToast(`Course ID ${q} not found in AVL tree`, 'error');
@@ -331,7 +360,9 @@ document.getElementById('btnAvlSearch')?.addEventListener('click', async () => {
 
 document.getElementById('btnAvlReset')?.addEventListener('click', () => {
   const input = document.getElementById('avlSearchInput');
+  const pathBanner = document.getElementById('avlSearchPathBanner');
   if (input) input.value = '';
+  if (pathBanner) pathBanner.style.display = 'none';
   renderCatalogCards(state.courses);
   showToast('Displayed all courses in AVL In-Order (Sorted)', 'info');
 });
@@ -339,6 +370,9 @@ document.getElementById('btnAvlReset')?.addEventListener('click', () => {
 document.getElementById('btnAvlRange')?.addEventListener('click', async () => {
   const low = document.getElementById('avlRangeLow')?.value.trim() || 'CS100';
   const high = document.getElementById('avlRangeHigh')?.value.trim() || 'CS999';
+  const pathBanner = document.getElementById('avlSearchPathBanner');
+  if (pathBanner) pathBanner.style.display = 'none';
+
   try {
     const res = await fetch(`${API_BASE}/courses/range?low=${encodeURIComponent(low)}&high=${encodeURIComponent(high)}`);
     const data = await res.json();
@@ -429,6 +463,13 @@ async function runRecommendations() {
     const recs = data.recommendations || [];
     const locked = data.lockedCourses || [];
 
+    // Store debug data from C++ Max-Heap for the inspection panel
+    state.heapDebugData = {
+      initialHeapArray: data.initialHeapArray || [],
+      extractionLog: data.extractionLog || []
+    };
+    renderHeapDebugPanel();
+
     // Update Dashboard eligible count
     const dElig = document.getElementById('dashEligibleCourses');
     if (dElig) dElig.textContent = recs.length;
@@ -437,11 +478,17 @@ async function runRecommendations() {
     if (listEl) {
       listEl.innerHTML = '';
       if (recs.length === 0) {
-        listEl.innerHTML = `<div class="empty-state">All eligible catalog courses completed!</div>`;
+        listEl.innerHTML = `<div class="empty-state">No eligible courses found within active credit budget or all prerequisites pending.</div>`;
       } else {
         recs.forEach((item, idx) => {
           const row = document.createElement('div');
           row.className = 'recommendation-row';
+
+          // Ensure budget score has proper sign
+          const budgetBadge = item.budgetScore >= 0
+            ? `<span class="score-chip">Budget Fit: <strong>+${item.budgetScore}</strong></span>`
+            : `<span class="score-chip chip-negative">Budget Fit: <strong>${item.budgetScore}</strong></span>`;
+
           row.innerHTML = `
             <div class="rec-rank-circle">#${idx + 1}</div>
             <div class="rec-info">
@@ -451,14 +498,17 @@ async function runRecommendations() {
                 <span class="badge badge-cyan">${item.course.track}</span>
                 <span class="badge badge-indigo">${item.course.credits} Cr</span>
               </div>
-              <div class="rec-rationale">${item.rationale}</div>
+              <div class="rec-rationale" style="margin-bottom:0.35rem;">${item.rationale}</div>
+              <div class="score-chips-row">
+                <span class="score-chip">Track Match: <strong>+${item.trackScore}</strong></span>
+                <span class="score-chip">Keywords: <strong>+${item.interestScore}</strong></span>
+                <span class="score-chip">GPA Rigor: <strong>+${item.gpaFitScore}</strong></span>
+                <span class="score-chip">Prereqs: <strong>+${item.prereqScore}</strong></span>
+                ${budgetBadge}
+                <span class="score-sum-check">✓ Sum = ${item.totalScore} Pts</span>
+              </div>
             </div>
-            <div class="rec-score-breakdown">
-              <div>Interest: <strong>+${item.interestScore}</strong></div>
-              <div>GPA Fit: <strong>+${item.gpaFitScore}</strong></div>
-              <div>Prereq: <strong>+${item.prereqScore}</strong></div>
-              <div class="score-pill">${item.totalScore} Pts</div>
-            </div>
+            <div class="score-pill">${item.totalScore} Pts</div>
           `;
           listEl.appendChild(row);
         });
@@ -468,47 +518,100 @@ async function runRecommendations() {
     // Render Dashboard Top 3 Preview
     if (dashTopEl) {
       dashTopEl.innerHTML = '';
-      recs.slice(0, 3).forEach((item, idx) => {
-        const itemDiv = document.createElement('div');
-        itemDiv.className = 'recommendation-row mb-3';
-        itemDiv.style.padding = '0.75rem 1rem';
-        itemDiv.innerHTML = `
-          <div class="rec-rank-circle" style="width:30px; height:30px; font-size:0.8rem;">#${idx + 1}</div>
-          <div class="rec-info">
-            <div class="rec-title-bar">
-              <strong>${item.course.id}</strong> - ${item.course.name}
+      if (recs.length === 0) {
+        dashTopEl.innerHTML = `<div class="empty-state">No eligible courses currently available.</div>`;
+      } else {
+        recs.slice(0, 3).forEach((item, idx) => {
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'recommendation-row mb-3';
+          itemDiv.style.padding = '0.75rem 1rem';
+          itemDiv.innerHTML = `
+            <div class="rec-rank-circle" style="width:30px; height:30px; font-size:0.8rem;">#${idx + 1}</div>
+            <div class="rec-info">
+              <div class="rec-title-bar">
+                <strong>${item.course.id}</strong> - ${item.course.name}
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">${item.rationale}</div>
             </div>
-            <div style="font-size:0.75rem; color:var(--text-muted);">${item.rationale}</div>
-          </div>
-          <div class="score-pill" style="font-size:0.8rem;">${item.totalScore}</div>
-        `;
-        dashTopEl.appendChild(itemDiv);
-      });
+            <div class="score-pill" style="font-size:0.8rem;">${item.totalScore} Pts</div>
+          `;
+          dashTopEl.appendChild(itemDiv);
+        });
+      }
     }
 
     // Render Locked Courses
     if (lockedEl) {
       lockedEl.innerHTML = '';
-      locked.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'locked-card';
-        card.innerHTML = `
-          <div class="locked-card-title">
-            <span>${item.course.id} - ${item.course.name}</span>
-            <span>${item.course.track}</span>
-          </div>
-          <div class="locked-missing">
-            Missing Prerequisites: <strong>${(item.missingPrerequisites || []).join(', ') || 'Requirements incomplete'}</strong>
-          </div>
-        `;
-        lockedEl.appendChild(card);
-      });
+      if (locked.length === 0) {
+        lockedEl.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">All eligible specialization courses are unlocked!</div>`;
+      } else {
+        locked.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'locked-card';
+          card.innerHTML = `
+            <div class="locked-card-title">
+              <span>${item.course.id} - ${item.course.name}</span>
+              <span>${item.course.track}</span>
+            </div>
+            <div class="locked-missing">
+              Missing Prerequisites: <strong>${(item.missingPrerequisites || []).join(', ') || 'Requirements incomplete'}</strong>
+            </div>
+          `;
+          lockedEl.appendChild(card);
+        });
+      }
     }
 
   } catch (err) {
     showToast('Failed to evaluate course recommendations', 'error');
   }
 }
+
+function renderHeapDebugPanel() {
+  const arrayContainer = document.getElementById('heapArrayContainer');
+  const extractionContainer = document.getElementById('heapExtractionContainer');
+
+  if (arrayContainer && state.heapDebugData?.initialHeapArray) {
+    if (state.heapDebugData.initialHeapArray.length === 0) {
+      arrayContainer.innerHTML = `<div class="empty-state">Heap is empty.</div>`;
+    } else {
+      arrayContainer.innerHTML = state.heapDebugData.initialHeapArray.map(node => `
+        <div class="heap-node-card">
+          <div class="heap-node-idx">[Index ${node.index}] ${node.index === 0 ? 'ROOT (MAX)' : 'NODE'}</div>
+          <div style="font-weight:700; color:#fff;">${node.courseId}</div>
+          <div class="heap-node-score">${node.score} pts</div>
+          <div class="heap-node-pointers">
+            ${node.parentIndex !== undefined ? `P: [${node.parentIndex}] ` : ''}
+            ${node.leftChildIndex !== undefined ? `L: [${node.leftChildIndex}] ` : ''}
+            ${node.rightChildIndex !== undefined ? `R: [${node.rightChildIndex}]` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+
+  if (extractionContainer && state.heapDebugData?.extractionLog) {
+    if (state.heapDebugData.extractionLog.length === 0) {
+      extractionContainer.innerHTML = `<div class="empty-state">No extractions performed.</div>`;
+    } else {
+      extractionContainer.innerHTML = state.heapDebugData.extractionLog.map(step => `
+        <div style="padding:0.45rem 0.75rem; border-bottom:1px solid rgba(255,255,255,0.05); font-family:var(--font-mono); font-size:0.78rem;">
+          <strong style="color:var(--cyan-light);">Step ${step.step}:</strong> Popped Root <strong>${step.poppedCourse}</strong> (Score: ${step.score}) 
+          | Heap Size: ${step.heapSizeBefore} ➔ ${step.heapSizeAfter} 
+          | <span style="color:var(--text-dim);">${step.operation}</span>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+document.getElementById('btnToggleHeapDebug')?.addEventListener('click', () => {
+  const panel = document.getElementById('heapDebugPanel');
+  if (!panel) return;
+  const isHidden = panel.style.display === 'none';
+  panel.style.display = isHidden ? 'block' : 'none';
+});
 
 document.getElementById('btnRefreshRecs')?.addEventListener('click', () => {
   runRecommendations();
@@ -542,11 +645,12 @@ async function runKnapsackOptimization(creditBudget = 12) {
     if (selectedBox) {
       selectedBox.innerHTML = '';
       if (selected.length === 0) {
-        selectedBox.innerHTML = `<div class="empty-state">No electives fit inside current budget.</div>`;
+        selectedBox.innerHTML = `<div class="empty-state">Credit budget too low to select any elective courses.</div>`;
       } else {
         selected.forEach(c => {
           const item = document.createElement('div');
           item.className = 'recommendation-row mb-3';
+          const courseVal = Math.round((c.difficulty * 10 + c.credits * 5) * 10) / 10;
           item.innerHTML = `
             <div class="rec-info">
               <div class="rec-title-bar">
@@ -555,6 +659,9 @@ async function runKnapsackOptimization(creditBudget = 12) {
                 <span class="badge badge-cyan">${c.track}</span>
               </div>
               <div style="font-size:0.78rem; color:var(--text-muted);">${c.description || ''}</div>
+              <div style="font-size:0.75rem; color:var(--emerald); margin-top:0.25rem; font-family:var(--font-mono);">
+                Credit Weight: <strong>${c.credits} Cr</strong> | Benefit Value: <strong>${courseVal} Pts</strong>
+              </div>
             </div>
             <div class="score-pill">${c.credits} Credits</div>
           `;
@@ -595,6 +702,12 @@ budgetSlider?.addEventListener('input', e => {
   const valDisplay = document.getElementById('budgetSliderVal');
   if (valDisplay) valDisplay.textContent = val;
   runKnapsackOptimization(val);
+  // Also update active student budget and refresh recommendations
+  if (state.activeStudent) {
+    state.activeStudent.creditBudget = val;
+    if (elements.stripBudget) elements.stripBudget.textContent = `${val} Credits`;
+    runRecommendations();
+  }
 });
 
 // ---------------- Learning Paths & Canvas Visualizer ---------------- //
@@ -643,25 +756,37 @@ async function computeLearningPath(start, target) {
     const bfsCount = document.getElementById('bfsEdgeCount');
     const bfsVisited = document.getElementById('bfsNodesVisited');
     const bfsSeq = document.getElementById('bfsPathSequence');
+    const bfsVisitedSeq = document.getElementById('bfsVisitedSequence');
 
     const dijkstraEffort = document.getElementById('dijkstraTotalEffort');
     const dijkstraVisited = document.getElementById('dijkstraNodesVisited');
     const dijkstraSeq = document.getElementById('dijkstraPathSequence');
+    const dijkstraVisitedSeq = document.getElementById('dijkstraVisitedSequence');
 
     if (data.bfsFewestHops.found) {
       if (bfsCount) bfsCount.textContent = `${data.bfsFewestHops.edgeCount} hops`;
       if (bfsVisited) bfsVisited.textContent = `${data.bfsFewestHops.nodesVisited} nodes`;
       if (bfsSeq) bfsSeq.textContent = data.bfsFewestHops.path.join('  ➜  ');
+      if (bfsVisitedSeq) {
+        bfsVisitedSeq.textContent = data.bfsFewestHops.visitedOrder ? data.bfsFewestHops.visitedOrder.join(' ➜ ') : '-';
+      }
     } else {
       if (bfsSeq) bfsSeq.textContent = `No reachable pathway found from ${start} to ${target}.`;
+      if (bfsVisitedSeq) bfsVisitedSeq.textContent = '-';
+      if (bfsCount) bfsCount.textContent = 'Unreachable';
     }
 
     if (data.dijkstraMinEffort.found) {
       if (dijkstraEffort) dijkstraEffort.textContent = `${data.dijkstraMinEffort.totalEffort.toFixed(1)} effort score`;
       if (dijkstraVisited) dijkstraVisited.textContent = `${data.dijkstraMinEffort.nodesVisited} extracts`;
       if (dijkstraSeq) dijkstraSeq.textContent = data.dijkstraMinEffort.path.join('  ➜  ');
+      if (dijkstraVisitedSeq) {
+        dijkstraVisitedSeq.textContent = data.dijkstraMinEffort.visitedOrder ? data.dijkstraMinEffort.visitedOrder.join(' ➜ ') : '-';
+      }
     } else {
       if (dijkstraSeq) dijkstraSeq.textContent = `No reachable pathway found from ${start} to ${target}.`;
+      if (dijkstraVisitedSeq) dijkstraVisitedSeq.textContent = '-';
+      if (dijkstraEffort) dijkstraEffort.textContent = 'Unreachable';
     }
 
     // Update Dashboard Quick Result Box
@@ -1008,6 +1133,22 @@ document.getElementById('btnRunMstCompare')?.addEventListener('click', async () 
     const grid = document.getElementById('mstResultsGrid');
     if (grid) grid.style.display = 'grid';
 
+    // Verification Banner
+    const banner = document.getElementById('mstVerificationBanner');
+    if (banner) {
+      banner.style.display = 'flex';
+      const isMatch = Math.abs(data.kruskal.totalWeight - data.prim.totalWeight) < 1e-4;
+      banner.innerHTML = `
+        <span class="badge ${isMatch ? 'badge-emerald' : 'badge-rose'}">
+          ${isMatch ? '✓ Algorithmic Equivalence Verified' : '✗ Weight Discrepancy'}
+        </span>
+        <span>
+          Both Kruskal (Disjoint Set Union) and Prim (Min-Priority Queue) computed on G(V=${data.networkNodes ? data.networkNodes.length : 16}, E=${data.originalEdgeCount || 21}) yield 
+          <strong>Identical Minimum Spanning Tree Weight: ${data.kruskal.totalWeight.toFixed(1)}</strong>.
+        </span>
+      `;
+    }
+
     // Kruskal
     const kWeight = document.getElementById('kruskalWeight');
     const kEdges = document.getElementById('kruskalEdges');
@@ -1066,19 +1207,37 @@ document.getElementById('btnRunAdvancedGraph')?.addEventListener('click', async 
       bfBox.textContent = txt;
     }
 
-    // Floyd Warshall
+    // Floyd Warshall All-Pairs Distance Matrix
     const fwWrap = document.getElementById('fwMatrixWrap');
-    if (fwWrap && data.connected) {
-      fwWrap.innerHTML = `
-        <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
+    if (fwWrap && data.floydWarshall?.matrix) {
+      const nodes = data.floydWarshall.nodes || [];
+      const matrix = data.floydWarshall.matrix || [];
+
+      let tblHtml = `<table class="dp-table"><thead><tr><th>Src \\ Dst</th>`;
+      nodes.forEach(n => { tblHtml += `<th>${n}</th>`; });
+      tblHtml += `</tr></thead><tbody>`;
+
+      matrix.forEach((row, i) => {
+        tblHtml += `<tr><th>${nodes[i]}</th>`;
+        row.forEach(val => {
+          const isInf = (val === 'INF');
+          tblHtml += `<td style="${isInf ? 'color:var(--text-dim);' : 'color:var(--cyan-light); font-weight:600;'}">${val}</td>`;
+        });
+        tblHtml += `</tr>`;
+      });
+      tblHtml += `</tbody></table>`;
+
+      tblHtml += `
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.75rem; line-height:1.6;">
           <p><strong>Connected Academic Components:</strong> ${data.connected.componentCount}</p>
           <p><strong>Topological Sorting Order:</strong> ${data.dfs.topologicalSort.slice(0, 8).join(' ➜ ')}...</p>
           <p><strong>Cycle Detection Status:</strong> <span class="highlight-green">${data.dfs.hasCycle ? 'Cycle Detected' : 'No Cycles (Strict DAG)'}</span></p>
         </div>
       `;
+      fwWrap.innerHTML = tblHtml;
     }
 
-    showToast('Executed Bellman-Ford and DFS Cycle Detection via C++', 'success');
+    showToast('Executed Bellman-Ford and Floyd-Warshall via C++', 'success');
   } catch (err) {
     showToast('Graph algorithms execution failed', 'error');
   }

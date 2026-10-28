@@ -92,16 +92,21 @@ int main(int argc, char* argv[]) {
         } else if (cmd == "catalog_search") {
             AVLTree tree = buildAVLTree(data.value("courses", json::array()));
             std::string id = data.value("id", "");
-            const Course* found = tree.search(id);
+            std::vector<std::string> path;
+            const Course* found = tree.search(id, path);
             if (found) {
                 result = {
                     {"found", true},
-                    {"course", found->toJson()}
+                    {"course", found->toJson()},
+                    {"searchPath", path},
+                    {"comparisons", path.size()}
                 };
             } else {
                 result = {
                     {"found", false},
-                    {"message", "Course ID not found in AVL tree"}
+                    {"message", "Course ID not found in AVL tree"},
+                    {"searchPath", path},
+                    {"comparisons", path.size()}
                 };
             }
         } else if (cmd == "catalog_range") {

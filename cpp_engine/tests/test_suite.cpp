@@ -63,6 +63,12 @@ TEST(AVLTree_Rotations_And_Balance) {
     assert(tree.search("CS102") != nullptr);
     assert(tree.search("CS999") == nullptr);
 
+    // Search with path tracking
+    std::vector<std::string> searchPath;
+    assert(tree.search("CS102", searchPath) != nullptr);
+    assert(!searchPath.empty());
+    assert(searchPath.back() == "CS102");
+
     // Range search
     auto range = tree.getRange("CS100", "CS102");
     assert(range.size() == 3);
@@ -170,9 +176,9 @@ TEST(MaxHeap_Operations) {
     assert(heap.size() == 0);
 
     Course dummy{"C", "Name", "Core", 3, 2, 1, {}, {}, ""};
-    RecommendationItem item1{dummy, 50.0, 10, 10, 10, 20, true, {}, "R1"};
-    RecommendationItem item2{dummy, 90.0, 20, 20, 20, 30, true, {}, "R2"};
-    RecommendationItem item3{dummy, 70.0, 15, 15, 15, 25, true, {}, "R3"};
+    RecommendationItem item1{dummy, 50.0, 10, 10, 10, 10, 10, true, {}, "R1", {}};
+    RecommendationItem item2{dummy, 90.0, 30, 15, 20, 15, 10, true, {}, "R2", {}};
+    RecommendationItem item3{dummy, 70.0, 20, 10, 15, 15, 10, true, {}, "R3", {}};
 
     heap.push(item1);
     heap.push(item2);
@@ -193,11 +199,12 @@ TEST(MaxHeap_Operations) {
     assert(heap.empty());
 }
 
-TEST(CourseRecommender_PrerequisiteFilter) {
+TEST(CourseRecommender_PrerequisiteFilter_And_ScoreConsistency) {
     Course intro{"CS101", "Intro", "Core", 3, 1, 1, {}, {"python"}, ""};
     Course advAI{"CS401", "Advanced AI", "AI/ML", 4, 5, 4, {"CS101", "CS201"}, {"ai", "deep-learning"}, ""};
+    Course dataStruct{"CS201", "Data Structures", "Core", 4, 3, 2, {"CS101"}, {"arrays", "trees"}, ""};
 
-    std::vector<Course> catalog = {intro, advAI};
+    std::vector<Course> catalog = {intro, advAI, dataStruct};
     std::unordered_set<std::string> completed = {"CS101"}; // CS201 missing
     std::vector<std::string> interests = {"AI/ML"};
 
@@ -206,6 +213,18 @@ TEST(CourseRecommender_PrerequisiteFilter) {
     assert(rec["lockedCourses"].size() == 1);
     assert(rec["lockedCourses"][0]["course"]["id"] == "CS401");
     assert(rec["lockedCourses"][0]["isEligible"] == false);
+
+    // Verify mathematical score consistency on all generated recommendations
+    for (const auto& item : rec["recommendations"]) {
+        double expectedSum = item["trackScore"].get<double>() +
+                             item["interestScore"].get<double>() +
+                             item["gpaFitScore"].get<double>() +
+                             item["prereqScore"].get<double>() +
+                             item["budgetScore"].get<double>();
+        double total = item["totalScore"].get<double>();
+        assert(std::abs(expectedSum - total) < 1e-4);
+        assert(!item["rationale"].get<std::string>().empty());
+    }
 }
 
 // 4. DP Algorithms Tests

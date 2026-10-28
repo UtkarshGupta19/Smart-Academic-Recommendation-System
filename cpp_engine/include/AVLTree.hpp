@@ -111,14 +111,18 @@ private:
         return node;
     }
 
-    AVLNode* search(AVLNode* node, const std::string& id) const {
-        if (!node || node->course.id == id) {
+    AVLNode* search(AVLNode* node, const std::string& id, std::vector<std::string>& path) const {
+        if (!node) {
+            return nullptr;
+        }
+        path.push_back(node->course.id);
+        if (node->course.id == id) {
             return node;
         }
         if (id < node->course.id) {
-            return search(node->left, id);
+            return search(node->left, id, path);
         }
-        return search(node->right, id);
+        return search(node->right, id, path);
     }
 
     void inorder(AVLNode* node, std::vector<Course>& result) const {
@@ -198,9 +202,15 @@ public:
         return inserted;
     }
 
-    const Course* search(const std::string& id) const {
-        AVLNode* res = search(root, id);
+    const Course* search(const std::string& id, std::vector<std::string>& path) const {
+        path.clear();
+        AVLNode* res = search(root, id, path);
         return res ? &(res->course) : nullptr;
+    }
+
+    const Course* search(const std::string& id) const {
+        std::vector<std::string> dummy;
+        return search(id, dummy);
     }
 
     std::vector<Course> getInOrder() const {

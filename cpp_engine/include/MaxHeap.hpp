@@ -14,13 +14,15 @@ using json = nlohmann::json;
 struct RecommendationItem {
     Course course;
     double totalScore;
-    double interestScore;
+    double trackScore;
+    double interestScore;    // Keywords overlap
     double gpaFitScore;
     double prereqScore;
-    double trackScore;
+    double budgetScore;
     bool isEligible;
     std::vector<std::string> missingPrerequisites;
     std::string rationale;
+    std::vector<std::string> matchedKeywords;
 
     bool operator<(const RecommendationItem& other) const {
         return totalScore < other.totalScore;
@@ -33,14 +35,16 @@ struct RecommendationItem {
     json toJson() const {
         return json{
             {"course", course.toJson()},
-            {"totalScore", std::round(totalScore * 100.0) / 100.0},
-            {"interestScore", std::round(interestScore * 100.0) / 100.0},
-            {"gpaFitScore", std::round(gpaFitScore * 100.0) / 100.0},
-            {"prereqScore", std::round(prereqScore * 100.0) / 100.0},
-            {"trackScore", std::round(trackScore * 100.0) / 100.0},
+            {"totalScore", std::round(totalScore * 10.0) / 10.0},
+            {"trackScore", std::round(trackScore * 10.0) / 10.0},
+            {"interestScore", std::round(interestScore * 10.0) / 10.0},
+            {"gpaFitScore", std::round(gpaFitScore * 10.0) / 10.0},
+            {"prereqScore", std::round(prereqScore * 10.0) / 10.0},
+            {"budgetScore", std::round(budgetScore * 10.0) / 10.0},
             {"isEligible", isEligible},
             {"missingPrerequisites", missingPrerequisites},
-            {"rationale", rationale}
+            {"rationale", rationale},
+            {"matchedKeywords", matchedKeywords}
         };
     }
 };
@@ -150,9 +154,10 @@ public:
             }
             bool isEligible = missing.empty();
 
-            // 1. Interest Score & Track Matching (up to 40 pts)
+            // 1. Interest Score & Track Matching (up to 50 pts total)
             double trackScore = 0.0;
             double interestScore = 0.0;
+            std::vector<std::string> matchedKeywords;
 
             for (const auto& interest : interests) {
                 if (course.track == interest) {
@@ -161,6 +166,7 @@ public:
                 for (const auto& kw : course.keywords) {
                     if (kw == interest || interest.find(kw) != std::string::npos || kw.find(interest) != std::string::npos) {
                         interestScore += 5.0;
+                        matchedKeywords.push_back(kw);
                     }
                 }
             }
@@ -180,7 +186,7 @@ public:
             }
             gpaFitScore = std::max(5.0, gpaFitScore);
 
-            // 3. Prerequisite Preparedness Bonus (up to 15 pts)
+            // 3. Prerequisite Preparedness Bonus (15 pts if met, penalized if missing)
             double prereqScore = 0.0;
             if (isEligible) {
                 prereqScore = 15.0; // Ready to enroll immediately
@@ -188,7 +194,7 @@ public:
                 prereqScore = -15.0 * static_cast<double>(missing.size());
             }
 
-            // 4. Budget fit bonus (up to 10 pts)
+            // 4. Budget fit bonus (+10 pts if within credit limit, -10 pts if exceeds)
             double budgetScore = 0.0;
             if (course.credits <= creditBudget) {
                 budgetScore = 10.0;
@@ -196,27 +202,57 @@ public:
                 budgetScore = -10.0; // Exceeds current semester credit budget
             }
 
+            // Exact mathematical sum of all components
             double totalScore = trackScore + interestScore + gpaFitScore + prereqScore + budgetScore;
 
-            std::string rationale;
+            // Detailed rationale breakdown
+            std::string rationale = "";
             if (!isEligible) {
-                rationale = "Prerequisites incomplete (" + std::to_string(missing.size()) + " pending).";
-            } else if (trackScore > 0 || interestScore > 0) {
-                rationale = "High alignment with student interests in " + course.track + ".";
+                rationale = "Prerequisites incomplete (" + std::to_string(missing.size()) + " pending: ";
+                for (size_t i = 0; i < missing.size(); ++i) {
+                    if (i > 0) rationale += ", ";
+                    rationale += missing[i];
+                }
+                rationale += ").";
             } else {
-                rationale = "Core academic breadth recommended for current GPA profile.";
+                std::vector<std::string> parts;
+                if (trackScore > 0) {
+                    parts.push_back("Track alignment with " + course.track + " (+" + std::to_string(static_cast<int>(trackScore)) + " pts)");
+                }
+                if (interestScore > 0 && !matchedKeywords.empty()) {
+                    std::string kws = "Keywords matched: ";
+                    for (size_t i = 0; i < matchedKeywords.size(); ++i) {
+                        if (i > 0) kws += ", ";
+                        kws += matchedKeywords[i];
+                    }
+                    kws += " (+" + std::to_string(static_cast<int>(interestScore)) + " pts)";
+                    parts.push_back(kws);
+                }
+                parts.push_back("Difficulty " + std::to_string(course.difficulty) + "/5 matched to GPA " + std::to_string(normGpa).substr(0, 4) + " (+" + std::to_string(static_cast<int>(gpaFitScore)) + " pts)");
+                parts.push_back("Prerequisites completed (+15 pts)");
+                if (budgetScore > 0) {
+                    parts.push_back(std::to_string(course.credits) + " cr fits in budget of " + std::to_string(creditBudget) + " cr (+10 pts)");
+                } else {
+                    parts.push_back(std::to_string(course.credits) + " cr exceeds budget of " + std::to_string(creditBudget) + " cr (-10 pts)");
+                }
+                for (size_t i = 0; i < parts.size(); ++i) {
+                    if (i > 0) rationale += " • ";
+                    rationale += parts[i];
+                }
             }
 
             RecommendationItem item{
                 course,
                 totalScore,
+                trackScore,
                 interestScore,
                 gpaFitScore,
                 prereqScore,
-                trackScore,
+                budgetScore,
                 isEligible,
                 missing,
-                rationale
+                rationale,
+                matchedKeywords
             };
 
             if (isEligible) {
@@ -226,13 +262,40 @@ public:
             }
         }
 
-        // Extract top-K from Max-Heap
+        // Snapshot initial Max-Heap array structure before extractions
+        json initialHeapArray = json::array();
+        const auto& rawData = heap.getRawData();
+        for (size_t i = 0; i < rawData.size(); ++i) {
+            json nodeInfo = {
+                {"index", i},
+                {"courseId", rawData[i].course.id},
+                {"courseName", rawData[i].course.name},
+                {"score", std::round(rawData[i].totalScore * 10.0) / 10.0}
+            };
+            if (i > 0) nodeInfo["parentIndex"] = (i - 1) / 2;
+            if (2 * i + 1 < rawData.size()) nodeInfo["leftChildIndex"] = 2 * i + 1;
+            if (2 * i + 2 < rawData.size()) nodeInfo["rightChildIndex"] = 2 * i + 2;
+            initialHeapArray.push_back(nodeInfo);
+        }
+
+        // Extract top-K from Max-Heap and log each heapify step
         json recommendations = json::array();
+        json extractionLog = json::array();
         int extracted = 0;
         while (!heap.empty() && extracted < topK) {
+            size_t prevSize = heap.size();
             RecommendationItem topItem = heap.pop();
             recommendations.push_back(topItem.toJson());
             extracted++;
+
+            extractionLog.push_back({
+                {"step", extracted},
+                {"poppedCourse", topItem.course.id},
+                {"score", std::round(topItem.totalScore * 10.0) / 10.0},
+                {"heapSizeBefore", prevSize},
+                {"heapSizeAfter", heap.size()},
+                {"operation", "Root extracted in O(1); back element moved to root and heapifyDown(0) restored Max-Heap property in O(log N)."}
+            });
         }
 
         // Sort ineligible by totalScore descending
@@ -247,7 +310,9 @@ public:
             {"description", "Extracts optimal course recommendations in O(K log N) time based on multi-criteria heuristic scoring."},
             {"recommendations", recommendations},
             {"lockedCourses", lockedRecommendations},
-            {"totalEligible", extracted + heap.size()}
+            {"totalEligible", extracted + heap.size()},
+            {"initialHeapArray", initialHeapArray},
+            {"extractionLog", extractionLog}
         };
     }
 };
